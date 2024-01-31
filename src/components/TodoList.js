@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { Audio } from "react-loader-spinner";
 import axios from 'axios'
 
 const TodoList = () => {
 
     let [input,setInput]=useState("")
+    let [loading,setLoading]=useState(true)
     let [list, setList] = useState([]);
     let [edit,setEdit]=useState({})
     let [enableEdit,setEnableEdit]=useState(false)
@@ -16,11 +18,13 @@ const TodoList = () => {
 
     let fetchList=async ()=>
     {
+        setLoading(true);
        try 
        {
           let fetched=await axios.get('https://todobackendverison.onrender.com/todo/list/fetch')
           console.log(fetched.data.data)
           setList(fetched.data.data)
+          setLoading(false);
           return fetched.data
        }
        catch(e)
@@ -32,11 +36,13 @@ const TodoList = () => {
 
     let deleteTodo=async (_id)=>
     {
+      setLoading(true);
       console.log("AUr Kuch Na Janu Bas itna hi Janu",_id)
       try 
       {
         let deleted = await axios.delete(`https://todobackendverison.onrender.com/todo/list/delete/${_id}`);
         fetchList()
+        setLoading(false);
         return deleted.data
       }
       catch(e)
@@ -47,6 +53,7 @@ const TodoList = () => {
 
 
     let handleEditRequest = async (id) => {
+      setLoading(true);
       let {_id,status,task}=edit
       try {
         let edited = await axios.put(
@@ -54,6 +61,7 @@ const TodoList = () => {
           {_id,status,task:input}
         )
         fetchList();
+        setLoading(false);
         return edited.data;
       } catch (e) {
         console.log(e);
@@ -76,13 +84,14 @@ const TodoList = () => {
         }
         else 
         {
-
             try 
             {
               console.log("It is warm in here")
+               setLoading(true);
                let response=await axios.post('https://todobackendverison.onrender.com/todo/list/add',{task:input,status:false})
                setInput("")
                fetchList()
+               setLoading(true);
                return response.data
             }
             catch(e)
@@ -123,10 +132,12 @@ const TodoList = () => {
 
     let handleCheckbox=async (_id,items)=>
     {
+        setLoading(true);
        try 
        {
          let updatedCheckbox = await axios.put(`https://todobackendverison.onrender.com/todo/list/update/${_id}`,items)
          fetchList()
+          setLoading(false);
          return updatedCheckbox.data
        }
        catch(e)
@@ -161,32 +172,80 @@ const TodoList = () => {
 
 
   return (
-    <main className='w-[95vw] max-w-[550px] bg-white mx-auto mt-12 px-3 md:px-8 py-6 text-center overflow-hidden shadow-md rounded-md'>
-       <h2 className='text-xl font-normal tracking-wide'>Todo Buddy</h2>
-       <div className="input-button my-6 grid grid-cols-2 h-[35px] overflow-hidden" style={{gridTemplateColumns:"4fr 1fr"}}>
-        <input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder='Enter Task' className='outline-none border-[2px] w-[100%] md:auto border-l-slate-200 px-2 text-md rounded-l-md shadow-md focus:border-blue-500'/>
-        <button onClick={handleClick} className='text-[15px] rounded-r-md overflow-hidden text-white tracking-wider bg-blue-400'>{enableEdit?"Edit":"Submit"}</button>
-       </div>
-       <section className='mt-8'>
-          {list.map((items)=>
-          {
-            let {_id,task,status}=items;
-            return (
-              <article key={_id} className="flex justify-between items-center mb-3">
-                <div className="portside flex">
-                  <input type="checkbox" className='mr-3' checked={status} onChange={()=>handleCheckbox(_id,items)}/>
-                  <p className='capitalize' style={{textDecoration:status?"line-through":null}}>{task}</p>
-                </div>
-                <div className="starboard flex items-center">
-                    <button onClick={()=>handleEdit(_id)} className='text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-green-500'>Edit</button>
-                    <button onClick={()=>deleteTodo(_id)} className='text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-red-500'>Delete</button>
-                </div>
-              </article>
-            );
-          })}
-       </section>
+    <main className="w-[95vw] max-w-[550px] bg-white mx-auto mt-12 px-3 md:px-8 py-6 text-center overflow-hidden shadow-md rounded-md">
+      <h2 className="text-xl font-normal tracking-wide">Todo Buddy</h2>
+      <div
+        className="input-button my-6 grid grid-cols-2 h-[35px] overflow-hidden"
+        style={{ gridTemplateColumns: "4fr 1fr" }}
+      >
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter Task"
+          className="outline-none border-[2px] w-[100%] md:auto border-l-slate-200 px-2 text-md rounded-l-md shadow-md focus:border-blue-500"
+        />
+        <button
+          onClick={handleClick}
+          className="text-[15px] rounded-r-md overflow-hidden text-white tracking-wider bg-blue-400"
+        >
+          {enableEdit ? "Edit" : "Submit"}{" "}
+          {loading &&
+            render(
+              <Audio
+                height="100"
+                width="100"
+                color="#4fa94d"
+                ariaLabel="audio-loading"
+                wrapperStyle={{}}
+                wrapperClass="wrapper-class"
+                visible={true}
+              />
+            )}
+        </button>
+      </div>
+      <section className="mt-8">
+        {list.map((items) => {
+          let { _id, task, status } = items;
+          return (
+            <article
+              key={_id}
+              className="flex justify-between items-center mb-3"
+            >
+              <div className="portside flex">
+                <input
+                  type="checkbox"
+                  className="mr-3"
+                  checked={status}
+                  onChange={() => handleCheckbox(_id, items)}
+                />
+                <p
+                  className="capitalize"
+                  style={{ textDecoration: status ? "line-through" : null }}
+                >
+                  {task}
+                </p>
+              </div>
+              <div className="starboard flex items-center">
+                <button
+                  onClick={() => handleEdit(_id)}
+                  className="text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-green-500"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteTodo(_id)}
+                  className="text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-red-500"
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </section>
     </main>
-  )
+  );
 }
 
 
