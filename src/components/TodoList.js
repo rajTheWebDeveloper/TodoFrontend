@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Audio } from "react-loader-spinner";
+import { Audio,Bars,ColorRing,Oval} from "react-loader-spinner";
+import styled from 'styled-components'
 import axios from 'axios'
 
 const TodoList = () => {
 
     let [input,setInput]=useState("")
-    let [loading,setLoading]=useState(true)
+    let [loading,setLoading]=useState(false)
     let [list, setList] = useState([]);
     let [edit,setEdit]=useState({})
     let [enableEdit,setEnableEdit]=useState(false)
@@ -172,81 +173,107 @@ const TodoList = () => {
 
 
   return (
-    <main className="w-[95vw] max-w-[550px] bg-white mx-auto mt-12 px-3 md:px-8 py-6 text-center overflow-hidden shadow-md rounded-md">
-      <h2 className="text-xl font-normal tracking-wide">Todo Buddy</h2>
-      <div
-        className="input-button my-6 grid grid-cols-2 h-[35px] overflow-hidden"
-        style={{ gridTemplateColumns: "4fr 1fr" }}
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter Task"
-          className="outline-none border-[2px] w-[100%] md:auto border-l-slate-200 px-2 text-md rounded-l-md shadow-md focus:border-blue-500"
-        />
-        <button
-          onClick={handleClick}
-          className="text-[15px] rounded-r-md overflow-hidden text-white tracking-wider bg-blue-400"
+    <StyledTodo>
+      <main className="w-[95vw] max-w-[550px] bg-white mx-auto mt-12 px-3 md:px-8 py-6 text-center overflow-hidden shadow-md rounded-md">
+        <h2 className="text-xl font-normal tracking-wide">Todo Buddy</h2>
+        <div
+          className="input-button my-6 grid grid-cols-2 h-[35px] overflow-hidden"
+          style={{ gridTemplateColumns: "4fr 1fr" }}
         >
-          {enableEdit ? "Edit" : "Submit"}{" "}
-          {loading &&
-            render(
-              <Audio
-                height="100"
-                width="100"
-                color="#4fa94d"
-                ariaLabel="audio-loading"
-                wrapperStyle={{}}
-                wrapperClass="wrapper-class"
-                visible={true}
-              />
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Enter Task"
+            className="outline-none border-[2px] w-[100%] md:auto border-l-slate-200 px-2 text-md rounded-l-md shadow-md focus:border-blue-500"
+          />
+          <button
+            onClick={handleClick}
+            className="load-btn text-[15px] rounded-r-md overflow-hidden text-white tracking-wider bg-blue-400 flex items-center justify-center"
+          >
+            {enableEdit ? "Edit" : "Submit"}
+            {loading && (
+              <span className="loader">
+                {
+                  <Oval
+                    visible={true}
+                    height="23"
+                    width="23"
+                    color="#ffffff"
+                    ariaLabel="oval-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                  />
+                }
+              </span>
             )}
-        </button>
-      </div>
-      <section className="mt-8">
-        {list.map((items) => {
-          let { _id, task, status } = items;
-          return (
-            <article
-              key={_id}
-              className="flex justify-between items-center mb-3"
-            >
-              <div className="portside flex">
-                <input
-                  type="checkbox"
-                  className="mr-3"
-                  checked={status}
-                  onChange={() => handleCheckbox(_id, items)}
-                />
-                <p
-                  className="capitalize"
-                  style={{ textDecoration: status ? "line-through" : null }}
-                >
-                  {task}
-                </p>
-              </div>
-              <div className="starboard flex items-center">
-                <button
-                  onClick={() => handleEdit(_id)}
-                  className="text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-green-500"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteTodo(_id)}
-                  className="text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-red-500"
-                >
-                  Delete
-                </button>
-              </div>
-            </article>
-          );
-        })}
-      </section>
-    </main>
+          </button>
+        </div>
+        <section className="mt-8">
+          {list.map((items) => {
+            let { _id, task, status } = items;
+            return (
+              <article
+                key={_id}
+                className="flex justify-between items-center mb-3"
+              >
+                <div className="portside flex">
+                  <input
+                    type="checkbox"
+                    className="mr-3"
+                    checked={status}
+                    onChange={() => handleCheckbox(_id, items)}
+                  />
+                  <p
+                    className="capitalize"
+                    style={{ textDecoration: status ? "line-through" : null }}
+                  >
+                    {task}
+                  </p>
+                </div>
+                <div className="starboard flex items-center">
+                  <button
+                    onClick={() => handleEdit(_id)}
+                    className="text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-green-500"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteTodo(_id)}
+                    className="text-sm text-white px-[9px] py-[1px] mx-1 rounded-sm bg-red-500"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      </main>
+    </StyledTodo>
   );
 }
 
+
+let StyledTodo = styled.section`
+  .load-btn {
+    position: relative;
+    z-index: 5;
+  }
+  .loader {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color:white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #60a5fa;
+    z-index: 10;
+  }
+`;
 
 export default TodoList
