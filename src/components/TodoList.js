@@ -225,7 +225,7 @@ const TodoList = () => {
                     onChange={() => handleCheckbox(_id, items)}
                   />
                   <p
-                    className="capitalize"
+                    className="capitalize text-left"
                     style={{ textDecoration: status ? "line-through" : null }}
                   >
                     {task}
